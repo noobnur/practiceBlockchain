@@ -15,7 +15,7 @@ class P2pServer {
         const server = new WebSocket.Server({ port: P2P_PORT })
         server.on('connection', socket => {this.connectSocket(socket)})
 
-        this.connectToPeers();
+        this.connectToPeers(); // after we make a 'connection' to the server, we will connect to peers
 
         console.log(`Listening for peer-to-peer connections on ${P2P_PORT}`)
     }
@@ -25,16 +25,19 @@ class P2pServer {
             const socket = new WebSocket(peer)
 
             socket.on('open', () => this.connectSocket(socket))
+            // for each peer, we make a new websocket at diff ports
+            // and for each socket made we 'open' it and connect socket
+
         })
     }
 
     connectSocket(socket) {
-        this.sockets.push(socket)
+        this.sockets.push(socket) // which adds in new sockets within the instantiated p2pserver's sockets array
         console.log('Socket connected')
 
-        this.messageHandler(socket)
+        this.messageHandler(socket) // for each socket, we give it the message handling capabilities
 
-        this.sendChain(socket)
+        this.sendChain(socket) // and sends the latest chain 
     }
 
     messageHandler(socket) {
@@ -43,11 +46,12 @@ class P2pServer {
             console.log('data', data)
 
             this.blockchain.replaceChain(data)
+            // each time the socket receives a message (which is the data), this blockchain will replace the chain in this blockchain
         })
     }
 
     syncChains() {
-        this.sockets.forEach( socket =>  { this.sendChain(socket) })
+        this.sockets.forEach( socket =>  { this.sendChain(socket) }) 
     }
 
     sendChain(socket) {
