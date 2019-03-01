@@ -13,6 +13,6 @@ While websockets are DEFINITELY not socks that people can wear, this analogy did
 
 2. For blockchain, only the longest and most up-to-date chain will be across all. I tried to create one instance that is not connected to ALL the diff peers. Some data will be lost :/
 
-3. 
+3. Proof-of-work is written within the mine block itself. It is to dissuade bad peers, coz all peers can add to the block. The PoW makes it manageable to submit one block but unproductive and seriously expensive to generate a whole chain that may be used to manipulate good chains. Have to keep creating the hash with the same number of leading 0s as the difficulty level (eg diff = 4 , hash must be '0000blahblah')
 
 
