@@ -16,6 +16,7 @@ class P2pServer {
         server.on('connection', socket => {this.connectSocket(socket)})
 
         this.connectToPeers(); // after we make a 'connection' to the server, we will connect to peers
+        // each time a new peer comes in on connection, the instance of the P2pServer will fun the connectToO 
 
         console.log(`Listening for peer-to-peer connections on ${P2P_PORT}`)
     }
@@ -46,7 +47,8 @@ class P2pServer {
             console.log('data', data)
 
             this.blockchain.replaceChain(data)
-            // each time the socket receives a message (which is the data), this blockchain will replace the chain in this blockchain
+            // each time the socket receives a message (which is the data), 
+            // this blockchain will replace the chain in this blockchain
         })
     }
 
