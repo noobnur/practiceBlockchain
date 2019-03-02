@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 const bc = new Blockchain()
 const wallet = new Wallet()
 const tp = new TransactionPool()
-const p2pServer = new P2pServer(bc) // instantiate the p2pserver using the constructor and the first blockchain
+const p2pServer = new P2pServer(bc, tp) // instantiate the p2pserver using the constructor and the first blockchain
 
 app.get('/blocks', (req, res) => {
     res.json(bc.chain)
@@ -35,7 +35,12 @@ app.get('/transactions', (req, res) => {
 app.post('/transact', (req,res) => {
     const { recipient, amount } = req.body
     transaction = wallet.createTransaction(recipient, amount, tp)
+    p2pServer.broadcastTransaction(transaction)
     res.redirect('/transactions')
+})
+
+app.get('/public-key', (req,res) => {
+    res.json({ publicKey: wallet.publicKey})
 })
 
 // req.body 
