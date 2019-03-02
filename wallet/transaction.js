@@ -6,6 +6,26 @@ class Transaction {
         this.input = null
         this.outputs = [] // 1. How much user wants to send 2.How much left after transaction
     }
+    
+    // handling a new output object to an existing transaction by the sender.
+    // it updates the output detailing the resulting amount
+    // resigns the transaction
+    update(senderWallet, recipient, amount) { 
+
+        //if user makes a transaction that exceeds what they have already deligated
+        const senderOutput = this.outputs.find(output => output.address === senderWallet.publicKey);
+
+        if (amount > senderOutput.amount) {
+            console.log(`Amount: ${amount} exceeds balance.`);
+            return;
+        }
+
+        senderOutput.amount = senderOutput.amount - amount;
+        this.outputs.push({ amount, address: recipient });
+        Transaction.signTransaction(this, senderWallet);
+
+        return this;
+    }
 
     static newTransaction(senderWallet, recipient, amount) {
         const transaction = new this()
@@ -33,6 +53,14 @@ class Transaction {
             address: senderWallet.publicKey,
             signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
         }
+    }
+
+    static verifyTransaction(transaction) {
+        return ChainUtil.verifySignature(
+            transaction.input.address,
+            transaction.input.signature,
+            ChainUtil.hash(transaction.outputs)
+        )
     }
 }
 
