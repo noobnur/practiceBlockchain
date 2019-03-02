@@ -2,6 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const Blockchain = require('../blockchain')
 const P2pServer = require('./p2p-server')
+const Wallet = require('../wallet')
+const TransactionPool = require('../wallet/transaction-pool')
 
 const HTTP_PORT = process.env.HTTP_PORT || 3001
 // eg. $HTTP_PORT=3002 npm run dev
@@ -10,6 +12,8 @@ const app = express()
 app.use(bodyParser.json())
 
 const bc = new Blockchain()
+const wallet = new Wallet()
+const tp = new TransactionPool()
 const p2pServer = new P2pServer(bc) // instantiate the p2pserver using the constructor and the first blockchain
 
 app.get('/blocks', (req, res) => {
@@ -23,6 +27,22 @@ app.post('/mine', (req,res) => {
     p2pServer.syncChains() // each time a new block is added to the chain, the server will sync with all the other servers
     res.redirect('/blocks')
 })
+
+app.get('/transactions', (req, res) => {
+    res.json(tp.transactions)
+})
+
+app.post('/transact', (req,res) => {
+    const { recipient, amount } = req.body
+    transaction = wallet.createTransaction(recipient, amount, tp)
+    res.redirect('/transactions')
+})
+
+// req.body 
+// {
+// 	"recipient": "foo-4dr355",
+// 	"amount":  50
+// }
 
 app.listen(HTTP_PORT, () => {console.log(`Listening on port ${HTTP_PORT}`)})
 
