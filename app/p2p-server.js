@@ -4,7 +4,8 @@ const P2P_PORT = process.env.P2P_PORT || 5001
 const peers = process.env.PEERS ? process.env.PEERS.split(',') : []
 const MESSAGE_TYPES = {
     chain: 'CHAIN',
-    transaction: 'TRANSACTION'
+    transaction: 'TRANSACTION',
+    clear_transactions: 'CLEAR_TRANSACTIONS'
 }
 
 // $ HTTP_PORT=3002 P2P_PORT=5003 PEERS=ws://localhost:5001,ws://localhost:5002 npm run dev
@@ -61,6 +62,9 @@ class P2pServer {
                     this.transactionPool.updateOrAddTransaction(data.transaction)
                     break
                     // keeps transaction pool up to date
+                case MESSAGE_TYPES.clear_transactions:
+                    this.transactionPool.clear()
+                    break
             }
         })
     }
@@ -71,6 +75,12 @@ class P2pServer {
 
     broadcastTransaction(transaction){
         this.sockets.forEach(socket => {this.sendTransaction(socket, transaction)})
+    }
+
+    broadcastClearTransaction(transaction) {
+        this.sockets.forEach(socket => socket.send(JSON.stringify({
+            type: MESSAGE_TYPES.clear_transactions
+        })))
     }
 
     sendChain(socket) {
